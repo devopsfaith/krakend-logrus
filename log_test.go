@@ -108,13 +108,37 @@ func ExampleNewLogger() {
 	// level=error msg="Critical msg" module=pref
 }
 
+func ExampleWrapLogger() {
+	buff := new(bytes.Buffer)
+
+	logrusLogger := logrus.New()
+	logrusLogger.Formatter = &logrus.TextFormatter{DisableTimestamp: true}
+	logrusLogger.SetLevel(logrus.DebugLevel)
+	logrusLogger.SetOutput(buff)
+
+	logger := WrapLogger(logrusLogger, "pref")
+	logger.Debug(debugMsg)
+	logger.Info(infoMsg)
+	logger.Warning(warningMsg)
+	logger.Error(errorMsg)
+	logger.Critical(criticalMsg)
+
+	fmt.Println(buff.String())
+	// output:
+	// level=debug msg="Debug msg" module=pref
+	// level=info msg="Info msg" module=pref
+	// level=warning msg="Warning msg" module=pref
+	// level=error msg="Error msg" module=pref
+	// level=error msg="Critical msg" module=pref
+}
+
 func ExampleConfigGetter() {
 	cfg := ConfigGetter(newExtraConfig("DEBUG")).(Config)
 	fmt.Println(cfg.JSONFormatter)
 	fmt.Printf("%+v\n", cfg.TextFormatter)
 	// output:
 	// <nil>
-	// &{ForceColors:false DisableColors:false DisableTimestamp:false FullTimestamp:true TimestampFormat: DisableSorting:false QuoteEmptyFields:false isTerminal:false Once:{m:{state:0 sema:0} done:0}}
+	// &{ForceColors:false DisableColors:false DisableTimestamp:false FullTimestamp:true TimestampFormat: DisableSorting:false DisableLevelTruncation:false QuoteEmptyFields:false isTerminal:false FieldMap:map[] Once:{m:{state:0 sema:0} done:0}}
 }
 
 func TestNewLogger_unknownLevel(t *testing.T) {

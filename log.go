@@ -42,6 +42,15 @@ func NewLogger(cfg config.ExtraConfig, ws ...io.Writer) (*Logger, error) {
 	}, nil
 }
 
+// WrapLogger wraps already configured logrus instance
+func WrapLogger(l *logrus.Logger, module string) *Logger {
+	return &Logger{
+		logger: l,
+		level:  l.Level,
+		module: module,
+	}
+}
+
 func setFormatter(l *logrus.Logger, cfg Config) {
 	switch {
 	case cfg.JSONFormatter != nil:
